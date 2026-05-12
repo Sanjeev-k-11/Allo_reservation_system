@@ -1,69 +1,36 @@
+import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { redis } from "@/lib/redis";
 
 export async function POST(req: Request) {
-    const body = await req.json();
+  const { inventoryId, quantity = 1 } = await req.json();
 
-    const { productId, warehouseId, quantity } = body;
+  try {
+    // 1. Atomic database update: Only increments if there is enough available stock.
+    // This is 100% safe from race conditions under heavy concurrency.
+    const result = await prisma.$executeRaw`
+      UPDATE "Inventory"
+      SET "reservedUnits" = "reservedUnits" + ${quantity}
+      WHERE "id" = ${inventoryId}
+        AND ("totalUnits" - "reservedUnits") >= ${quantity}
+    `;
 
-    const lockKey = `lock:${productId}:${warehouseId}`;
+    // If result is 0, no rows were updated (meaning not enough stock)
+    if (result === 0) {
+      return NextResponse.json({ error: "Not enough stock available" }, { status: 409 });
+    }
 
-    const lock = await redis.set(lockKey, "locked", {
-        nx: true,
-        ex: 5,
+    // 2. Create the reservation record
+    const reservation = await prisma.reservation.create({
+      data: {
+        inventoryId,
+        quantity,
+        status: "pending",
+        expiresAt: new Date(Date.now() + 10 * 60 * 1000), // 10 minutes
+      },
     });
 
-    if (!lock) {
-        return Response.json(
-            { error: "Another reservation in progress" },
-            { status: 409 }
-        );
-    }
-
-    try {
-        const inventory = await prisma.inventory.findFirst({
-            where: { productId, warehouseId,},
-        });
-
-        if (!inventory) {
-            return Response.json(
-                { error: "Inventory not found" },
-                { status: 404 }
-            );
-        }
-
-        const available =
-            inventory.totalStock - inventory.reservedStock;
-
-        if (available < quantity) {
-            return Response.json(
-                { error: "Not enough stock" },
-                { status: 409 }
-            );
-        }
-
-        await prisma.inventory.update({
-            where: {
-                id: inventory.id,
-            },
-            data: {
-                reservedStock: { increment: quantity,},
-            },
-        });
-
-        const reservation = await prisma.reservation.create({
-            data: {
-                productId,
-                warehouseId,
-                quantity,
-                status: "pending",
-                expiresAt: new Date(Date.now() + 10 * 60 * 1000),
-            },
-        });
-
-        return Response.json(reservation);
-
-    } finally {
-        await redis.del(lockKey);
-    }
+    return NextResponse.json(reservation);
+  } catch (error) {
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+  }
 }
