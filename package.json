@@ -11,6 +11,9 @@
   "prisma": {
     "seed": "ts-node prisma/seed.ts"
   },
+  "scripts": {
+  "build": "prisma generate && next build"
+},
   "dependencies": {
     "@prisma/client": "^5.22.0",
     "@upstash/redis": "^1.38.0",
