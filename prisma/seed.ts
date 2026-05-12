@@ -8,54 +8,75 @@ async function main() {
   await prisma.product.deleteMany();
   await prisma.warehouse.deleteMany();
 
-  const keyboard = await prisma.product.create({
+  const Asuslaptop = await prisma.product.create({
     data: {
-      name: "Allo Keyboard",
+      name: "Asus Laptop",
     },
   });
 
-  const mouse = await prisma.product.create({
+  const mymobile = await prisma.product.create({
     data: {
-      name: "Allo Mouse",
+      name: "oneplus mobile",
     },
   });
 
-  const mumbai = await prisma.warehouse.create({
+  const watch = await prisma.product.create({
     data: {
-      location: "Mumbai",
+      name: "boult wahtch",
     },
   });
 
-  const delhi = await prisma.warehouse.create({
+  const punjab = await prisma.warehouse.create({
     data: {
-      location: "Delhi",
+      location: "phagwara punjab",
+    },
+  });
+
+  const Ludiyana = await prisma.warehouse.create({
+    data: {
+      location: "Ludiyana",
+    },
+  });
+
+  const watchlocation = await prisma.warehouse.create({
+    data: {
+      location: "madhubani",
     },
   });
 
   await prisma.inventory.createMany({
     data: [
       {
-        productId: keyboard.id,
-        warehouseId: mumbai.id,
+        productId: Asuslaptop.id,
+        warehouseId: punjab.id,
         totalUnits: 10,
         reservedUnits: 0,
       },
       {
-        productId: keyboard.id,
-        warehouseId: delhi.id,
+        productId: Asuslaptop.id,
+        warehouseId: Ludiyana.id,
         totalUnits: 5,
         reservedUnits: 0,
       },
+       
       {
-        productId: mouse.id,
-        warehouseId: mumbai.id,
+        productId: mymobile.id,
+        warehouseId: punjab.id,
         totalUnits: 8,
         reservedUnits: 0,
       },
+      {
+        productId: watch.id,
+        warehouseId: watchlocation.id,
+        totalUnits: 15,
+        reservedUnits: 0,
+      },
+      
+
     ],
   });
 
-  console.log("✅ data inserted");
+  console.log("data inserted");
 }
 
 main()

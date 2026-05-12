@@ -12,9 +12,8 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  // Fetch the reservation to get the expiresAt time
   useEffect(() => {
-    fetch(`/api/reservations/${id}`) // Note: You'll need a quick GET /api/reservations/[id] route, or pass expiresAt in local storage. For strictness, let's assume standard behavior.
+    fetch(`/api/reservations/${id}`) 
       .then(res => res.json())
       .then(data => {
          const expires = new Date(data.expiresAt).getTime();
@@ -53,7 +52,7 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
       if (res.status === 410) setStatus("expired");
       setError(data.error || `Failed to ${action}`);
     } else {
-      setStatus(data.status); // "confirmed" or "released"
+      setStatus(data.status);
     }
     setLoading(false);
   };
