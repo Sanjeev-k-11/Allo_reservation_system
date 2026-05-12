@@ -8,9 +8,11 @@ datasource db {
 }
 
 model Product {
-  id            String        @id
-  name          String
+  id    String @id @default(cuid())
+  name  String
+}
 
-  inventories   Inventory[]
-  reservations  Reservation[]
+model Warehouse {
+  id       String @id @default(cuid())
+  location String
 }
