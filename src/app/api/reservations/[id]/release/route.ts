@@ -45,6 +45,8 @@ export async function POST(
       });
 
       await redis.del(`lock:${reservation.inventoryId}`);
+      await redis.del("products:all");
+
 
       return NextResponse.json(updatedReservation);
     });
