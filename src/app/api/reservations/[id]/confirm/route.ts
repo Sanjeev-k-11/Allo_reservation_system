@@ -65,6 +65,8 @@ export async function POST(
       });
 
       await redis.del(redisKey);
+      await redis.del("products:all");
+
 
       return NextResponse.json({
         success: true,
