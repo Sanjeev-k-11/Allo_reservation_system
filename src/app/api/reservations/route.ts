@@ -11,7 +11,7 @@ export async function POST(req: Request) {
 
     if (!inventoryId) {
       return NextResponse.json(
-        { error: "Missing required fields: inventoryId" },
+        { error: "Missing required: inventoryId" },
         { status: 400 }
       );
     }
@@ -44,7 +44,6 @@ export async function POST(req: Request) {
         { status: 409 }
       );
     }
- 
     const reservation = await prisma.reservation.create({
       data: {
         inventoryId,
@@ -53,9 +52,8 @@ export async function POST(req: Request) {
         expiresAt: new Date(Date.now() + 10 * 60 * 1000),
       },
     });
-
+    await redis.del("products:all");
     return NextResponse.json(reservation);
-
   } catch (error) {
     console.error("Reservation Error:", error);
 
