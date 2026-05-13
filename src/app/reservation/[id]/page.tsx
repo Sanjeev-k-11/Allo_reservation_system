@@ -86,9 +86,8 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
 
         {status === "confirmed" && (
           <div className="text-center py-10">
-            <div className="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">✓</div>
             <h2 className="text-xl font-bold text-gray-900">Payment Successful!</h2>
-            <p className="text-gray-500 mt-2">Your order has been confirmed.</p>
+            <p className="text-gray-500 mt-2">Your order confirmed.</p>
             <button onClick={() => router.push('/')} className="mt-8 text-sm font-semibold text-black underline">Return to Store</button>
           </div>
         )}
@@ -96,7 +95,7 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
         {status === "released" && (
           <div className="text-center py-10">
             <h2 className="text-xl font-bold text-gray-900">Reservation Cancelled</h2>
-            <p className="text-gray-500 mt-2">The item has been returned to stock.</p>
+            <p className="text-gray-500 mt-2">The item returned to stock.</p>
             <button onClick={() => router.push('/')} className="mt-8 text-sm font-semibold text-black underline">Return to Store</button>
           </div>
         )}
