@@ -1,9 +1,5 @@
 # Allo Inventory Reservation System
 
-[![Live Demo](https://img.shields.io/badge/Live%20Demo-allohealth01.vercel.app-blue?style=flat-square)](https://allohealth01.vercel.app/)   
-
-[![GitHub](https://img.shields.io/badge/GitHub-Source-black?style=flat-square)](https://github.com/your-username/your-repo)
-
 A focused inventory reservation app built to solve checkout race conditions for multi-warehouse retail.
 
 ## Demo
@@ -20,47 +16,10 @@ A focused inventory reservation app built to solve checkout race conditions for 
 ## Tech stack
 - Next.js ( Router )
 - TypeScript
-- Prisma + superbase
+- Prisma + PostgreSQL
 - Upstash Redis for idempotency
 - Tailwind CSS
 - React Query for client data fetching
-
-## File structure
-```
-.
-├─ package.json
-├─ prisma/
-│  ├─ schema.prisma
-│  └─ seed.ts
-├─ src/
-│  ├─ app/
-│  │  ├─ page.tsx
-│  │  ├─ reservation/
-│  │  │  └─ [id]/page.tsx
-│  │  ├─ api/
-│  │  │  ├─ products/route.ts
-│  │  │  ├─ warehouses/route.ts
-│  │  │  ├─ reservations/
-│  │  │  │  ├─ route.ts
-│  │  │  │  ├─ query/route.ts
-│  │  │  │  └─ [id]/
-│  │  │  │     ├─ confirm/route.ts
-│  │  │  │     └─ release/route.ts
-│  │  │  └─ cron/
-│  │  │     └─ expire-reservations/route.ts
-│  ├─ services/
-│  │  └─ reservation.service.ts
-│  └─ lib/
-│     ├─ prisma.ts
-│     ├─ redis.ts
-│     
-```
-
-## Data model overview
-- `Product`: product metadata and related inventory/reservations.
-- `Warehouse`: warehouse metadata.
-- `Inventory`: stock per `productId` + `warehouseId`, stores `totalStock` and `reservedStock`.
-- `Reservation`: pending/confirmed/released/expired hold with `quantity` and `expiresAt`.
 
 ## Core API routes
 - `GET /api/products`
@@ -92,7 +51,6 @@ This means two simultaneous reservations for the last unit cannot both succeed.
 ## Expiry 
 Expired reservations are released automatically by a cron-style cleanup endpoint:
 
-- `GET /api/cron/expire-reservations`
 - It finds all `PENDING` reservations with `expiresAt < now`
 - For each expired reservation, it decrements `reservedStock` and marks the reservation `EXPIRED`
 
